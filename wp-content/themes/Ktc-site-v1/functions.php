@@ -36,10 +36,10 @@ function ktc_fallback_menu() {
 
 // ── Enqueue Styles & Scripts ──────────────────────────────────
 function ktc_enqueue_assets() {
-    // Google Fonts
+    // Google Fonts — Poppins for headings (clean, geometric, Apple-adjacent)
     wp_enqueue_style(
         'ktc-google-fonts',
-        'https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap',
+        'https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800;900&display=swap',
         [],
         null
     );
@@ -49,7 +49,7 @@ function ktc_enqueue_assets() {
         'ktc-main-style',
         get_template_directory_uri() . '/css/style.css',
         [ 'ktc-google-fonts' ],
-        '1.1'
+        '1.2'
     );
 
     // Main script

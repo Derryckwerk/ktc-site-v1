@@ -22,20 +22,20 @@ get_header();
     </div>
 
     <div class="hero-inner">
-        <div class="hero-logo">
+        <div class="hero-logo reveal">
             <img
                 src="<?php echo esc_url( get_template_directory_uri() ); ?>/images/logo-full.png"
                 alt="Kuruman Tuition Centre Crest"
             >
         </div>
-        <div class="hero-badge">Welcome to KTC</div>
-        <h1 class="hero-title">
+        <div class="hero-badge reveal reveal-delay-1">Welcome to KTC</div>
+        <h1 class="hero-title reveal reveal-delay-2">
             <span>Kuruman</span> Tuition Centre
         </h1>
-        <p class="hero-subtitle">
+        <p class="hero-subtitle reveal reveal-delay-3">
             Registered Independent Primary School &mdash; Nurturing Future Leaders Since 2016
         </p>
-        <a href="#about" class="hero-btn">Discover Our Story &#8595;</a>
+        <a href="#about" class="hero-btn reveal reveal-delay-4">Discover Our Story &#8595;</a>
     </div>
 </section>
 
@@ -50,34 +50,34 @@ get_header();
         <span class="bg-shape bpu hide-mobile" style="top:15%;left:1.5%;font-size:1.8rem;animation-duration:18s;animation-delay:-5s;">&#9829;</span>
     </div>
 
-    <div class="section-header">
+    <div class="section-header reveal">
         <h2>&#128247; Life at KTC</h2>
         <div class="section-divider"></div>
         <p>Moments from our school community &mdash; photos coming soon!</p>
     </div>
 
     <div class="gallery-grid">
-        <div class="photo-placeholder">
+        <div class="photo-placeholder reveal reveal-delay-1">
             <div class="ph-icon">&#127979;</div>
             <span>Classroom Life</span>
         </div>
-        <div class="photo-placeholder">
+        <div class="photo-placeholder reveal reveal-delay-2">
             <div class="ph-icon">&#9917;</div>
             <span>Sports &amp; Activities</span>
         </div>
-        <div class="photo-placeholder">
+        <div class="photo-placeholder reveal reveal-delay-3">
             <div class="ph-icon">&#127912;</div>
             <span>Arts &amp; Culture</span>
         </div>
-        <div class="photo-placeholder">
+        <div class="photo-placeholder reveal reveal-delay-1">
             <div class="ph-icon">&#127891;</div>
             <span>Achievements</span>
         </div>
-        <div class="photo-placeholder">
+        <div class="photo-placeholder reveal reveal-delay-2">
             <div class="ph-icon">&#127775;</div>
             <span>School Events</span>
         </div>
-        <div class="photo-placeholder">
+        <div class="photo-placeholder reveal reveal-delay-3">
             <div class="ph-icon">&#129293;</div>
             <span>Our Community</span>
         </div>
@@ -97,7 +97,7 @@ get_header();
 
     <div class="about-inner">
 
-        <div class="about-logo-wrap">
+        <div class="about-logo-wrap reveal">
             <img
                 src="<?php echo esc_url( get_template_directory_uri() ); ?>/images/logo-black.png"
                 alt="Kuruman Tuition Centre Crest"
@@ -105,7 +105,7 @@ get_header();
             >
         </div>
 
-        <div class="about-content">
+        <div class="about-content reveal reveal-delay-2">
             <h2>&#128218; About Us</h2>
 
             <p>KTC is a registered independent primary school. KTC was founded in 2016, after we discovered a need for quality education.</p>
@@ -140,29 +140,29 @@ get_header();
         <span class="bg-shape bfa hide-mobile" style="top:20%;right:5%;font-size:1.8rem;animation-duration:18s;animation-delay:-1s;">&#9829;</span>
     </div>
 
-    <div class="section-header">
+    <div class="section-header reveal">
         <h2>&#127775; Our Pillars</h2>
         <div class="section-divider"></div>
         <p>The foundations we build every learner upon.</p>
     </div>
 
     <div class="values-grid">
-        <div class="value-card">
+        <div class="value-card reveal reveal-delay-1">
             <div class="value-icon">&#128218;</div>
             <h3>CAPS Aligned</h3>
             <p>A challenging, nationally aligned curriculum designed to unlock each learner&#8217;s full potential.</p>
         </div>
-        <div class="value-card">
+        <div class="value-card reveal reveal-delay-2">
             <div class="value-icon">&#9917;</div>
             <h3>Sports</h3>
             <p>Encouraging physical development, teamwork and a healthy, active lifestyle in every learner.</p>
         </div>
-        <div class="value-card">
+        <div class="value-card reveal reveal-delay-3">
             <div class="value-icon">&#127912;</div>
             <h3>Arts &amp; Culture</h3>
             <p>Celebrating creativity and self-expression to mold well-rounded future leaders.</p>
         </div>
-        <div class="value-card">
+        <div class="value-card reveal reveal-delay-4">
             <div class="value-icon">&#10024;</div>
             <h3>Values</h3>
             <p>Instilling love, respect and Christ-centred values in every learner, every single day.</p>

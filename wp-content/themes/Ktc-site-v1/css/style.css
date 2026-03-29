@@ -69,23 +69,6 @@ h1, h2, h3, h4 {
   text-decoration: none;
 }
 
-.logo-circle {
-  width: 54px;
-  height: 54px;
-  background: var(--gold);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Fredoka One', cursive;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--dark-charcoal);
-  box-shadow: 0 4px 10px rgba(255,184,48,.4);
-  flex-shrink: 0;
-  letter-spacing: .5px;
-}
-
 .logo-text-wrap .school-name {
   font-family: 'Fredoka One', cursive;
   font-size: 1.3rem;
@@ -148,6 +131,87 @@ h1, h2, h3, h4 {
   transition: all .3s;
 }
 
+/* ===== ANIMATED BACKGROUND SHAPES ===== */
+
+/* Keyframe animations — each gives a different gentle movement */
+@keyframes bgFloatA {
+  0%,100% { transform: translateY(0)   rotate(0deg);   }
+  50%      { transform: translateY(-14px) rotate(6deg); }
+}
+@keyframes bgFloatB {
+  0%,100% { transform: translateY(0)  rotate(0deg);    }
+  50%      { transform: translateY(14px) rotate(-6deg); }
+}
+@keyframes bgDriftA {
+  0%,100% { transform: translate(0, 0)      rotate(0deg);   }
+  33%     { transform: translate(10px,-10px) rotate(8deg);  }
+  66%     { transform: translate(-8px, 8px) rotate(-5deg);  }
+}
+@keyframes bgDriftB {
+  0%,100% { transform: translate(0, 0)      rotate(0deg);   }
+  33%     { transform: translate(-10px,10px) rotate(-8deg); }
+  66%     { transform: translate(8px,-8px)  rotate(5deg);   }
+}
+@keyframes bgSway {
+  0%,100% { transform: rotate(-8deg) scale(1);    }
+  50%      { transform: rotate(8deg)  scale(1.08); }
+}
+@keyframes bgPulse {
+  0%,100% { transform: scale(1)    rotate(0deg); opacity: var(--shape-op, .08); }
+  50%      { transform: scale(1.15) rotate(10deg); opacity: calc(var(--shape-op, .08) * 1.4); }
+}
+
+/* Base shape styles */
+.bg-shapes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.bg-shape {
+  position: absolute;
+  font-style: normal;
+  line-height: 1;
+  color: var(--gold);
+  opacity: .18;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+/* Animation assignment classes */
+.bfa  { animation-name: bgFloatA; }
+.bfb  { animation-name: bgFloatB; }
+.bda  { animation-name: bgDriftA; }
+.bdb  { animation-name: bgDriftB; }
+.bsw  { animation-name: bgSway;   }
+.bpu  { animation-name: bgPulse;  }
+
+/* Ensure all section content sits above shapes */
+.hero-section .hero-inner,
+.gallery-section .section-header,
+.gallery-section .gallery-grid,
+.about-section .about-inner,
+.values-section .section-header,
+.values-section .values-grid {
+  position: relative;
+  z-index: 1;
+}
+
+/* Reduce / pause on small screens — keep only the most subtle ones */
+@media (max-width: 480px) {
+  .bg-shape { opacity: .11; }
+  .bg-shape.hide-mobile { display: none; }
+}
+
+/* Respect user accessibility preference */
+@media (prefers-reduced-motion: reduce) {
+  .bg-shape { animation: none !important; }
+}
+
 /* ===== HERO ===== */
 .hero-section {
   background: linear-gradient(140deg, var(--mid-charcoal) 0%, var(--light-charcoal) 100%);
@@ -156,18 +220,6 @@ h1, h2, h3, h4 {
   position: relative;
   overflow: hidden;
 }
-
-.hero-section::before,
-.hero-section::after {
-  position: absolute;
-  opacity: .08;
-  font-size: 120px;
-  line-height: 1;
-  pointer-events: none;
-}
-
-.hero-section::before { content: '★'; top: 10px; left: 20px; color: var(--gold); }
-.hero-section::after  { content: '✏'; bottom: 10px; right: 30px; color: var(--gold); }
 
 .hero-inner {
   max-width: 820px;
@@ -255,7 +307,7 @@ section { padding: 72px 24px; }
 }
 
 /* ===== PHOTO PLACEHOLDER GRID ===== */
-.gallery-section { background: var(--dark-charcoal); }
+.gallery-section { background: var(--dark-charcoal); position: relative; overflow: hidden; }
 
 .gallery-grid {
   max-width: 1200px;
@@ -294,7 +346,7 @@ section { padding: 72px 24px; }
 .ph-icon { font-size: 2.6rem; }
 
 /* ===== ABOUT SECTION ===== */
-.about-section { background: var(--mid-charcoal); }
+.about-section { background: var(--mid-charcoal); position: relative; overflow: hidden; }
 
 .about-inner {
   max-width: 1100px;
@@ -348,7 +400,7 @@ section { padding: 72px 24px; }
 }
 
 /* ===== VALUES / PILLARS ===== */
-.values-section { background: var(--dark-charcoal); }
+.values-section { background: var(--dark-charcoal); position: relative; overflow: hidden; }
 
 .values-grid {
   max-width: 1100px;
@@ -428,6 +480,96 @@ section { padding: 72px 24px; }
   border-top: 1px solid rgba(255,255,255,.07);
   padding-top: 20px;
   margin-top: 20px;
+}
+
+/* ===== LOGOS ===== */
+
+/* Header logo image */
+.header-logo-img {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(255,184,48,.45));
+  transition: filter .3s, transform .3s;
+}
+
+.site-logo a:hover .header-logo-img {
+  filter: drop-shadow(0 6px 20px rgba(255,184,48,.75));
+  transform: scale(1.06);
+}
+
+/* Hero section logo emblem */
+.hero-logo {
+  width: 175px;
+  margin: 0 auto 28px;
+}
+
+.hero-logo img {
+  width: 100%;
+  filter: drop-shadow(0 10px 36px rgba(255,184,48,.6));
+  animation: heroFloat 3.6s ease-in-out infinite;
+}
+
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0);   }
+  50%       { transform: translateY(-9px); }
+}
+
+/* About section - black logo (inverted to white on dark bg) */
+.about-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px;
+  background: var(--light-charcoal);
+  border-radius: var(--radius);
+  border: 2px solid rgba(255,184,48,.25);
+  transition: border-color .3s;
+}
+
+.about-logo-wrap:hover {
+  border-color: var(--gold);
+}
+
+.about-logo-img {
+  width: 100%;
+  max-width: 300px;
+  filter: invert(1);
+  opacity: .88;
+  transition: opacity .3s, transform .3s;
+}
+
+.about-logo-wrap:hover .about-logo-img {
+  opacity: 1;
+  transform: scale(1.04);
+}
+
+/* Footer logo image */
+.footer-logo-img {
+  margin: 0 auto 10px;
+  width: 90px;
+}
+
+.footer-logo-img img {
+  width: 100%;
+  filter: drop-shadow(0 4px 14px rgba(255,184,48,.45));
+  transition: filter .3s, transform .3s;
+}
+
+.footer-logo-img img:hover {
+  filter: drop-shadow(0 6px 20px rgba(255,184,48,.7));
+  transform: scale(1.05);
+}
+
+/* Coming Soon logo */
+.cs-logo {
+  width: 110px;
+  margin: 0 auto 18px;
+}
+
+.cs-logo img {
+  width: 100%;
+  filter: drop-shadow(0 6px 20px rgba(255,184,48,.5));
 }
 
 /* ===== COMING SOON PAGE ===== */

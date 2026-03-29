@@ -1,5 +1,13 @@
 <footer class="site-footer">
     <div class="footer-inner">
+        <div class="footer-logo-img">
+            <img
+                src="<?php echo esc_url( get_template_directory_uri() ); ?>/images/logo-full.png"
+                alt="Kuruman Tuition Centre Crest"
+                width="90"
+                height="90"
+            >
+        </div>
         <div class="footer-logo">Kuruman Tuition Centre</div>
         <p class="footer-tagline">Registered Independent Primary School &mdash; Educating Future Leaders Since 2016</p>
 

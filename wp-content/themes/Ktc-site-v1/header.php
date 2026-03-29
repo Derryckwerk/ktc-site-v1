@@ -12,10 +12,16 @@
 
         <div class="site-logo">
             <a href="<?php echo esc_url( home_url( '/' ) ); ?>">
-                <div class="logo-circle">KTC</div>
+                <img
+                    src="<?php echo esc_url( get_template_directory_uri() ); ?>/images/logo-full.png"
+                    alt="Kuruman Tuition Centre Crest"
+                    class="header-logo-img"
+                    width="58"
+                    height="58"
+                >
                 <div class="logo-text-wrap">
                     <div class="school-name">Kuruman Tuition Centre</div>
-                    <div class="school-tag">Educating Future Leaders</div>
+                    <div class="school-tag">Soli Deo Gloria</div>
                 </div>
             </a>
         </div>

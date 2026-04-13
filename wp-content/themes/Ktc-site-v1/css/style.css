@@ -933,6 +933,14 @@ section { padding: 88px 32px; }
 
 .contact-detail-text a:hover { color: var(--gold-light); }
 
+/* Social buttons row */
+.contact-social-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+}
+
 /* Facebook button */
 .btn-facebook {
   display: inline-flex;
@@ -950,7 +958,6 @@ section { padding: 88px 32px; }
   transition: transform var(--t-fast) var(--ease-spring),
               box-shadow var(--t-base) var(--ease),
               background var(--t-fast) var(--ease);
-  align-self: flex-start;
 }
 
 .btn-facebook:hover {
@@ -961,6 +968,39 @@ section { padding: 88px 32px; }
 }
 
 .btn-facebook svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+/* Instagram button */
+.btn-instagram {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: .95rem;
+  padding: 14px 28px;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 18px rgba(214,36,159,.35);
+  transition: transform var(--t-fast) var(--ease-spring),
+              box-shadow var(--t-base) var(--ease),
+              filter var(--t-fast) var(--ease);
+}
+
+.btn-instagram:hover {
+  color: #fff;
+  filter: brightness(1.12);
+  transform: scale(1.04) translateY(-2px);
+  box-shadow: 0 8px 32px rgba(214,36,159,.52);
+}
+
+.btn-instagram svg {
   width: 20px;
   height: 20px;
   fill: currentColor;
@@ -1161,8 +1201,7 @@ section { padding: 88px 32px; }
               box-shadow var(--t-base) var(--ease);
 }
 
-/* Header bar floats OVER the feed — solid at top (masks FB heading), fades to transparent
-   so posts appear to emerge from underneath it */
+/* Header bar floats OVER the feed — solid box with gold border */
 .newsfeed-fb-header {
   position: absolute;
   top: 0;
@@ -1170,18 +1209,18 @@ section { padding: 88px 32px; }
   right: 0;
   z-index: 2;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: 14px 20px 48px;
-  background: linear-gradient(180deg,
-    var(--bg-elevated) 0%,
-    var(--bg-elevated) 52%,
-    rgba(36,36,40,0) 100%);
-  pointer-events: none; /* transparent gradient portion passes clicks through to feed */
+  padding: 14px 20px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid rgba(255,184,48,.30);
+  pointer-events: none;
 }
 
-/* Re-enable clicks on the button itself */
-.newsfeed-fb-header .btn-visit-fb {
+/* Re-enable clicks on the buttons themselves */
+.newsfeed-fb-header .btn-visit-fb,
+.newsfeed-fb-header .btn-visit-ig,
+.newsfeed-fb-header .newsfeed-social-btns {
   pointer-events: auto;
 }
 
@@ -1222,7 +1261,16 @@ section { padding: 88px 32px; }
   margin-top: -58px; /* shifts FB page header above the clip edge, hiding it */
 }
 
-/* Visit Page button */
+/* Newsfeed social buttons row */
+.newsfeed-social-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+/* Visit Page button (Facebook) */
 .btn-visit-fb {
   display: inline-flex;
   align-items: center;
@@ -1240,12 +1288,40 @@ section { padding: 88px 32px; }
               box-shadow var(--t-base) var(--ease);
   flex-shrink: 0;
 }
+.btn-visit-fb svg { width: 16px; height: 16px; fill: currentColor; flex-shrink: 0; }
 
 .btn-visit-fb:hover {
   background: #1467d6;
   color: #fff;
   transform: scale(1.04) translateY(-1px);
   box-shadow: 0 6px 20px rgba(24,119,242,.45);
+}
+
+/* Visit Instagram button */
+.btn-visit-ig {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: .82rem;
+  padding: 9px 18px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  transition: filter var(--t-fast) var(--ease),
+              transform var(--t-fast) var(--ease-spring),
+              box-shadow var(--t-base) var(--ease);
+  flex-shrink: 0;
+}
+.btn-visit-ig svg { width: 16px; height: 16px; fill: currentColor; flex-shrink: 0; }
+
+.btn-visit-ig:hover {
+  color: #fff;
+  filter: brightness(1.12);
+  transform: scale(1.04) translateY(-1px);
+  box-shadow: 0 6px 20px rgba(214,36,159,.45);
 }
 
 /* CTA button below the card */

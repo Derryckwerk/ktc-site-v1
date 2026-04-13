@@ -4,6 +4,31 @@
  * Admissions 2027 page for Kuruman Tuition Centre.
  */
 get_header();
+
+// Pull PDFs from the FileBird "Admissions" folder, keyed by file slug.
+$admissions_pdfs = ktc_get_filebird_pdfs( 'Admissions' );
+
+/**
+ * Helper: render a single download button.
+ * If the URL exists the button is live; otherwise it shows "Coming Soon".
+ */
+function ktc_download_btn( string $url, string $label ): void {
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 3h14v2H5v-2z"/></svg>';
+    if ( $url ) {
+        printf(
+            '<a href="%s" class="btn-download" download>%s %s</a>',
+            esc_url( $url ),
+            $svg,
+            esc_html( $label )
+        );
+    } else {
+        printf(
+            '<a href="#" class="btn-download btn-download--soon" aria-disabled="true" tabindex="-1">%s %s</a>',
+            $svg,
+            esc_html( $label )
+        );
+    }
+}
 ?>
 
 <section class="admissions-section">
@@ -24,8 +49,48 @@ get_header();
       <span class="admissions-eyebrow">ENROLMENTS OPEN</span>
       <h2>Admissions 2027</h2>
       <div class="section-divider"></div>
-      <p>As part of our application process, we conduct a diagnostic test to determine the areas where your child might need extra attention. Please note that you need to make an appointment for this test.</p>
     </div>
+
+    <!-- ── Download forms grid ─────────────────────────────── -->
+    <div class="admissions-forms-grid">
+
+      <div class="admissions-form-card reveal reveal-delay-1">
+        <span class="afc-icon" aria-hidden="true">📋</span>
+        <div class="afc-details">
+          <span class="afc-label">Form 1</span>
+          <h3>Application Form</h3>
+        </div>
+        <?php ktc_download_btn( $admissions_pdfs['ktc-primary'] ?? '', 'Download' ); ?>
+      </div>
+
+      <div class="admissions-form-card reveal reveal-delay-2">
+        <span class="afc-icon" aria-hidden="true">🚌</span>
+        <div class="afc-details">
+          <span class="afc-label">Form 2</span>
+          <h3>Transport Form</h3>
+        </div>
+        <?php ktc_download_btn( $admissions_pdfs['ktc-transport'] ?? '', 'Download' ); ?>
+      </div>
+
+      <div class="admissions-form-card reveal reveal-delay-3">
+        <span class="afc-icon" aria-hidden="true">🏦</span>
+        <div class="afc-details">
+          <span class="afc-label">Form 3</span>
+          <h3>Mandate &ndash; Debit Order</h3>
+        </div>
+        <?php ktc_download_btn( $admissions_pdfs['ktc-debit-order'] ?? '', 'Download' ); ?>
+      </div>
+
+      <div class="admissions-form-card reveal reveal-delay-4">
+        <span class="afc-icon" aria-hidden="true">🧒</span>
+        <div class="afc-details">
+          <span class="afc-label">Form 4</span>
+          <h3>Application Form ECD</h3>
+        </div>
+        <?php ktc_download_btn( $admissions_pdfs['ktc-ecd'] ?? '', 'Download' ); ?>
+      </div>
+
+    </div><!-- /admissions-forms-grid -->
 
     <!-- ── Info banner ─────────────────────────────────────── -->
     <div class="admissions-info-row reveal reveal-delay-1">
@@ -73,59 +138,6 @@ get_header();
       </div>
 
     </div>
-
-    <!-- ── Download forms grid ─────────────────────────────── -->
-    <div class="admissions-forms-grid">
-
-      <div class="admissions-form-card reveal reveal-delay-1">
-        <span class="afc-icon" aria-hidden="true">📋</span>
-        <div class="afc-details">
-          <span class="afc-label">Form 1</span>
-          <h3>Application Form</h3>
-        </div>
-        <a href="#" class="btn-download btn-download--soon" aria-disabled="true" tabindex="-1">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 3h14v2H5v-2z"/></svg>
-          Download
-        </a>
-      </div>
-
-      <div class="admissions-form-card reveal reveal-delay-2">
-        <span class="afc-icon" aria-hidden="true">🚌</span>
-        <div class="afc-details">
-          <span class="afc-label">Form 2</span>
-          <h3>Transport Form</h3>
-        </div>
-        <a href="#" class="btn-download btn-download--soon" aria-disabled="true" tabindex="-1">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 3h14v2H5v-2z"/></svg>
-          Download
-        </a>
-      </div>
-
-      <div class="admissions-form-card reveal reveal-delay-3">
-        <span class="afc-icon" aria-hidden="true">🏦</span>
-        <div class="afc-details">
-          <span class="afc-label">Form 3</span>
-          <h3>Mandate &ndash; Debit Order</h3>
-        </div>
-        <a href="#" class="btn-download btn-download--soon" aria-disabled="true" tabindex="-1">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 3h14v2H5v-2z"/></svg>
-          Download
-        </a>
-      </div>
-
-      <div class="admissions-form-card reveal reveal-delay-4">
-        <span class="afc-icon" aria-hidden="true">🧒</span>
-        <div class="afc-details">
-          <span class="afc-label">Form 4</span>
-          <h3>Application Form ECD</h3>
-        </div>
-        <a href="#" class="btn-download btn-download--soon" aria-disabled="true" tabindex="-1">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 16l-5-5h3V4h4v7h3l-5 5zm-7 3h14v2H5v-2z"/></svg>
-          Download
-        </a>
-      </div>
-
-    </div><!-- /admissions-forms-grid -->
 
     <!-- ── Submit completed form via site ─────────────────── -->
     <div class="admissions-submit-wrap reveal">

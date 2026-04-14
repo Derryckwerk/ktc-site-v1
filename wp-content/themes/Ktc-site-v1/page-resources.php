@@ -39,7 +39,7 @@ get_header();
         <button class="res-grade-btn" data-grade="Grade 7">Grade 7</button>
       </span>
       <button class="res-grade-btn res-grade-btn--ecd" data-grade="ECD">ECD</button>
-      <button class="res-grade-btn res-grade-btn--all" data-grade="all">All</button>
+      <button class="res-grade-btn res-grade-btn--additional" data-grade="Additional">Additional</button>
     </div>
 
     <!-- ── Term panel (revealed after grade selection) ─────── -->
@@ -50,7 +50,7 @@ get_header();
         <button class="res-term-btn" data-term="Term 2">Term 2</button>
         <button class="res-term-btn" data-term="Term 3">Term 3</button>
         <button class="res-term-btn" data-term="Term 4">Term 4</button>
-        <button class="res-term-btn" data-term="Others">Others</button>
+        <button class="res-term-btn" data-term="Other">Other</button>
       </div>
     </div>
 
@@ -63,9 +63,20 @@ get_header();
   <div class="res-modal">
     <button class="res-modal-close" id="resModalClose" aria-label="Close modal">&#10005;</button>
     <h2 class="res-modal-title" id="resModalTitle"></h2>
-    <div class="section-divider" style="margin-bottom:28px;"></div>
-    <div class="res-modal-body">
-      <p class="res-modal-empty">No resources available yet &mdash; check back soon!</p>
+    <div class="section-divider" style="margin-bottom:20px;"></div>
+    <div class="res-modal-body" id="resModalBody">
+      <div class="res-loading" id="resLoading" aria-live="polite">
+        <div class="res-spinner"></div>
+        <p>Loading files&hellip;</p>
+      </div>
+      <div class="res-file-list" id="resFileList" hidden>
+        <div class="res-download-all-wrap">
+          <button class="res-download-all-btn" id="resDownloadAll" type="button">&#8659; Download All Files</button>
+          <span class="res-file-count" id="resFileCount"></span>
+        </div>
+        <ul class="res-file-items" id="resFileItems" aria-label="Available files"></ul>
+      </div>
+      <p class="res-modal-empty" id="resModalEmpty" hidden>No resources available yet &mdash; check back soon!</p>
     </div>
   </div>
 </div>

@@ -47,50 +47,201 @@ document.addEventListener( 'DOMContentLoaded', function () {
     var modalOverlay = document.getElementById( 'resModalOverlay' );
     var modalTitle   = document.getElementById( 'resModalTitle' );
     var modalClose   = document.getElementById( 'resModalClose' );
+    var resLoading   = document.getElementById( 'resLoading' );
+    var resFileList  = document.getElementById( 'resFileList' );
+    var resFileItems = document.getElementById( 'resFileItems' );
+    var resFileCount = document.getElementById( 'resFileCount' );
+    var resDownloadAll = document.getElementById( 'resDownloadAll' );
+    var resModalEmpty  = document.getElementById( 'resModalEmpty' );
 
     if ( gradeButtons.length && termPanel ) {
 
         var selectedGrade = '';
+        var currentFiles  = [];  /* holds the last fetched file list */
+
+        /* ── Helpers ── */
+        function formatBytes( bytes ) {
+            if ( ! bytes ) { return ''; }
+            if ( bytes < 1024 ) { return bytes + ' B'; }
+            if ( bytes < 1048576 ) { return ( bytes / 1024 ).toFixed( 1 ) + ' KB'; }
+            return ( bytes / 1048576 ).toFixed( 1 ) + ' MB';
+        }
+
+        function mimeLabel( mime ) {
+            if ( ! mime ) { return 'File'; }
+            if ( mime === 'application/pdf' ) { return 'PDF'; }
+            if ( mime.indexOf( 'image/' ) === 0 ) { return 'Image'; }
+            if ( mime === 'application/msword' || mime.indexOf( 'wordprocessingml' ) !== -1 ) { return 'Word'; }
+            if ( mime === 'application/vnd.ms-excel' || mime.indexOf( 'spreadsheetml' ) !== -1 ) { return 'Excel'; }
+            if ( mime.indexOf( 'opendocument.text' ) !== -1 ) { return 'ODT'; }
+            if ( mime.indexOf( 'opendocument.spreadsheet' ) !== -1 ) { return 'ODS'; }
+            if ( mime.indexOf( 'opendocument.presentation' ) !== -1 ) { return 'ODP'; }
+            if ( mime === 'application/vnd.ms-powerpoint' || mime.indexOf( 'presentationml' ) !== -1 ) { return 'PPT'; }
+            if ( mime.indexOf( 'video/' ) === 0 ) { return 'Video'; }
+            if ( mime.indexOf( 'audio/' ) === 0 ) { return 'Audio'; }
+            return 'File';
+        }
+
+        function mimeColor( mime ) {
+            if ( ! mime ) { return '#888'; }
+            if ( mime === 'application/pdf' ) { return '#e74c3c'; }
+            if ( mime.indexOf( 'image/' ) === 0 ) { return '#27ae60'; }
+            if ( mime.indexOf( 'word' ) !== -1 || mime.indexOf( 'wordprocessingml' ) !== -1 ) { return '#2980b9'; }
+            if ( mime.indexOf( 'excel' ) !== -1 || mime.indexOf( 'spreadsheetml' ) !== -1 ) { return '#16a085'; }
+            if ( mime.indexOf( 'opendocument' ) !== -1 ) { return '#8e44ad'; }
+            if ( mime.indexOf( 'powerpoint' ) !== -1 || mime.indexOf( 'presentationml' ) !== -1 ) { return '#e67e22'; }
+            if ( mime.indexOf( 'video/' ) === 0 ) { return '#c0392b'; }
+            if ( mime.indexOf( 'audio/' ) === 0 ) { return '#d35400'; }
+            return '#7f8c8d';
+        }
+
+        function showLoading() {
+            resLoading.hidden   = false;
+            resFileList.hidden  = true;
+            resModalEmpty.hidden = true;
+        }
+
+        function renderFiles( files ) {
+            currentFiles = files;
+            resLoading.hidden = true;
+
+            if ( ! files || files.length === 0 ) {
+                resModalEmpty.hidden = false;
+                resFileList.hidden   = true;
+                return;
+            }
+
+            resModalEmpty.hidden = false;  /* keep false only if there are files — reset below */
+            resModalEmpty.hidden = true;
+            resFileList.hidden   = false;
+            resFileCount.textContent = files.length + ' file' + ( files.length === 1 ? '' : 's' );
+
+            resFileItems.innerHTML = '';
+            files.forEach( function ( file ) {
+                var li = document.createElement( 'li' );
+                li.className = 'res-file-item';
+
+                var badge = document.createElement( 'span' );
+                badge.className = 'res-file-type-badge';
+                badge.textContent = mimeLabel( file.mime );
+                badge.style.background = mimeColor( file.mime );
+
+                var nameWrap = document.createElement( 'span' );
+                nameWrap.className = 'res-file-name';
+                nameWrap.textContent = file.name;
+                if ( file.size ) {
+                    var sizeSp = document.createElement( 'span' );
+                    sizeSp.className = 'res-file-size';
+                    sizeSp.textContent = formatBytes( file.size );
+                    nameWrap.appendChild( sizeSp );
+                }
+
+                var dlBtn = document.createElement( 'a' );
+                dlBtn.className  = 'res-file-dl-btn';
+                dlBtn.href       = file.url;
+                dlBtn.download   = file.filename;
+                dlBtn.target     = '_blank';
+                dlBtn.rel        = 'noopener noreferrer';
+                dlBtn.textContent = 'Download';
+                dlBtn.setAttribute( 'aria-label', 'Download ' + file.name );
+
+                li.appendChild( badge );
+                li.appendChild( nameWrap );
+                li.appendChild( dlBtn );
+                resFileItems.appendChild( li );
+            } );
+        }
+
+        /* Fetch from WordPress AJAX */
+        function fetchFolder( parentFolder, childFolder ) {
+            if ( typeof window.KTC_RESOURCES === 'undefined' ) {
+                renderFiles( [] );
+                return;
+            }
+
+            showLoading();
+
+            var data = new FormData();
+            data.append( 'action',        'ktc_get_folder_media' );
+            data.append( 'nonce',         window.KTC_RESOURCES.nonce );
+            data.append( 'parent_folder', parentFolder );
+            if ( childFolder ) {
+                data.append( 'child_folder', childFolder );
+            }
+
+            fetch( window.KTC_RESOURCES.ajaxUrl, {
+                method: 'POST',
+                body: data,
+                credentials: 'same-origin'
+            } )
+            .then( function ( response ) { return response.json(); } )
+            .then( function ( json ) {
+                if ( json && json.success ) {
+                    renderFiles( json.data );
+                } else {
+                    renderFiles( [] );
+                }
+            } )
+            .catch( function () { renderFiles( [] ); } );
+        }
 
         /* Step 1 — click a grade button */
         gradeButtons.forEach( function ( btn ) {
             btn.addEventListener( 'click', function () {
-                /* Highlight the chosen grade */
                 gradeButtons.forEach( function ( b ) { b.classList.remove( 'is-active' ); } );
                 btn.classList.add( 'is-active' );
 
                 selectedGrade = btn.getAttribute( 'data-grade' );
 
-                /* "All" skips the term panel and opens the modal directly */
-                if ( selectedGrade === 'all' ) {
+                /* "Additional" skips the term panel – fetch & open modal directly */
+                if ( selectedGrade === 'Additional' ) {
                     termPanel.classList.remove( 'is-visible' );
                     termPanel.setAttribute( 'aria-hidden', 'true' );
-                    modalTitle.innerHTML = 'All<br><span class="res-modal-subtitle">Resources</span>';
+                    modalTitle.innerHTML = 'Additional<br><span class="res-modal-subtitle">Resources</span>';
                     openModal();
+                    fetchFolder( 'Additional' );
                     return;
                 }
 
-                /* Update the label and reveal the term panel */
                 termLabel.textContent = 'Select a term for ' + selectedGrade + ':';
                 termPanel.setAttribute( 'aria-hidden', 'false' );
                 termPanel.classList.add( 'is-visible' );
-
-                /* Smooth scroll to term panel */
                 termPanel.scrollIntoView( { behavior: 'smooth', block: 'nearest' } );
             } );
         } );
 
-        /* Step 2 — click a term button → open modal */
+        /* Step 2 — click a term button → open modal + fetch */
         termButtons.forEach( function ( btn ) {
             btn.addEventListener( 'click', function () {
                 var term = btn.getAttribute( 'data-term' );
                 modalTitle.innerHTML = selectedGrade + ' &ndash; ' + term + '<br><span class="res-modal-subtitle">Resources</span>';
                 openModal();
+                fetchFolder( selectedGrade, term );
             } );
         } );
 
-        /* Close modal helpers */
+        /* Download All: trigger each download with a small delay */
+        if ( resDownloadAll ) {
+            resDownloadAll.addEventListener( 'click', function () {
+                if ( ! currentFiles.length ) { return; }
+                currentFiles.forEach( function ( file, i ) {
+                    setTimeout( function () {
+                        var a = document.createElement( 'a' );
+                        a.href     = file.url;
+                        a.download = file.filename;
+                        a.target   = '_blank';
+                        a.rel      = 'noopener noreferrer';
+                        document.body.appendChild( a );
+                        a.click();
+                        document.body.removeChild( a );
+                    }, i * 400 );
+                } );
+            } );
+        }
+
+        /* ── Modal open / close ── */
         function openModal() {
+            showLoading();
             modalOverlay.setAttribute( 'aria-hidden', 'false' );
             modalOverlay.classList.add( 'is-open' );
             document.body.style.overflow = 'hidden';
@@ -108,13 +259,11 @@ document.addEventListener( 'DOMContentLoaded', function () {
         }
 
         if ( modalOverlay ) {
-            /* Close on backdrop click */
             modalOverlay.addEventListener( 'click', function ( e ) {
                 if ( e.target === modalOverlay ) { closeModal(); }
             } );
         }
 
-        /* Close on Escape key */
         document.addEventListener( 'keydown', function ( e ) {
             if ( e.key === 'Escape' && modalOverlay && modalOverlay.classList.contains( 'is-open' ) ) {
                 closeModal();

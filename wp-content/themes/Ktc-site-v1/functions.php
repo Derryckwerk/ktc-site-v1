@@ -50,7 +50,7 @@ function ktc_enqueue_assets() {
         'ktc-main-style',
         get_template_directory_uri() . '/css/style.css',
         [ 'ktc-google-fonts' ],
-        '1.2'
+        '1.3'
     );
 
     // Main script
@@ -58,9 +58,21 @@ function ktc_enqueue_assets() {
         'ktc-main-script',
         get_template_directory_uri() . '/js/script.js',
         [],
-        '1.1',
+        '1.2',
         true   // load in footer
     );
+
+    // Pass AJAX URL + nonce to the resources page
+    if ( is_page( 'resources' ) ) {
+        wp_localize_script(
+            'ktc-main-script',
+            'KTC_RESOURCES',
+            [
+                'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+                'nonce'   => wp_create_nonce( 'ktc_resources_nonce' ),
+            ]
+        );
+    }
 }
 add_action( 'wp_enqueue_scripts', 'ktc_enqueue_assets' );
 
@@ -209,3 +221,89 @@ function ktc_get_filebird_images( string $folder_name ): array {
 
     return $result;
 }
+
+// ── AJAX: fetch all media from a named FileBird folder ────────
+// Supports both flat folders (Additional) and nested folders (Grade X → Term Y).
+function ktc_ajax_get_folder_media() {
+    check_ajax_referer( 'ktc_resources_nonce', 'nonce' );
+
+    $parent_name = sanitize_text_field( wp_unslash( $_POST['parent_folder'] ?? '' ) );
+    $child_name  = sanitize_text_field( wp_unslash( $_POST['child_folder']  ?? '' ) );
+
+    if ( empty( $parent_name ) ) {
+        wp_send_json_error( 'Missing folder name', 400 );
+    }
+
+    global $wpdb;
+
+    // Look up the top-level folder (Grade / Additional / ECD).
+    $parent_id = $wpdb->get_var(
+        $wpdb->prepare(
+            "SELECT id FROM {$wpdb->prefix}fbv WHERE name = %s AND parent = 0 LIMIT 1",
+            $parent_name
+        )
+    );
+
+    if ( ! $parent_id ) {
+        wp_send_json_success( [] );
+        return;
+    }
+
+    // If a child folder (term) was specified, drill into it.
+    if ( ! empty( $child_name ) ) {
+        $folder_id = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT id FROM {$wpdb->prefix}fbv WHERE name = %s AND parent = %d LIMIT 1",
+                $child_name,
+                (int) $parent_id
+            )
+        );
+    } else {
+        $folder_id = $parent_id;
+    }
+
+    if ( ! $folder_id ) {
+        wp_send_json_success( [] );
+        return;
+    }
+
+    $ids = $wpdb->get_col(
+        $wpdb->prepare(
+            "SELECT attachment_id FROM {$wpdb->prefix}fbv_attachment_folder WHERE folder_id = %d",
+            (int) $folder_id
+        )
+    );
+
+    if ( empty( $ids ) ) {
+        wp_send_json_success( [] );
+        return;
+    }
+
+    $files = [];
+    foreach ( $ids as $attachment_id ) {
+        $attachment_id = (int) $attachment_id;
+        $url = wp_get_attachment_url( $attachment_id );
+        if ( ! $url ) {
+            continue;
+        }
+
+        $post      = get_post( $attachment_id );
+        $mime      = get_post_mime_type( $attachment_id );
+        $file_path = get_attached_file( $attachment_id );
+        $file_size = ( $file_path && file_exists( $file_path ) ) ? filesize( $file_path ) : 0;
+        $title     = $post ? $post->post_title : pathinfo( basename( $url ), PATHINFO_FILENAME );
+
+        $files[] = [
+            'id'       => $attachment_id,
+            'name'     => $title,
+            'url'      => esc_url( $url ),
+            'mime'     => $mime,
+            'size'     => $file_size,
+            'filename' => basename( $url ),
+        ];
+    }
+
+    wp_send_json_success( $files );
+}
+add_action( 'wp_ajax_ktc_get_folder_media',        'ktc_ajax_get_folder_media' );
+add_action( 'wp_ajax_nopriv_ktc_get_folder_media', 'ktc_ajax_get_folder_media' );

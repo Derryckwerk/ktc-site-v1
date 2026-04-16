@@ -39,49 +39,40 @@ get_header();
     </div>
 </section>
 
-<!-- ══ PHOTO PLACEHOLDERS ══════════════════════════════════ -->
-<section class="gallery-section">
+<?php
+$_ktc_home_gallery      = ktc_get_filebird_images( 'Gallery' );
+$_ktc_home_gallery_json = wp_json_encode( array_values( $_ktc_home_gallery ) );
+?>
+<!-- ══ HORIZONTAL FILMSTRIP ═════════════════════════════════ -->
+<section class="home-filmstrip-section">
 
     <!-- Animated background shapes -->
     <div class="bg-shapes" aria-hidden="true">
-        <span class="bg-shape bda" style="top:8%;right:3%;font-size:2.8rem;animation-duration:16s;animation-delay:-4s;">&#128247;</span>
-        <span class="bg-shape bfb" style="bottom:12%;left:2%;font-size:2.4rem;animation-duration:11s;animation-delay:-7s;">&#9733;</span>
-        <span class="bg-shape bsw hide-mobile" style="top:50%;right:1.5%;font-size:2rem;animation-duration:13s;animation-delay:-2s;">&#127912;</span>
-        <span class="bg-shape bpu hide-mobile" style="top:15%;left:1.5%;font-size:1.8rem;animation-duration:18s;animation-delay:-5s;">&#9829;</span>
+        <span class="bg-shape bda" style="top:14%;right:3%;font-size:2.8rem;animation-duration:16s;animation-delay:-4s;">&#128247;</span>
+        <span class="bg-shape bfb" style="top:18%;left:2%;font-size:2.4rem;animation-duration:11s;animation-delay:-7s;">&#9733;</span>
     </div>
 
     <div class="section-header reveal">
         <h2>&#128247; Life at KTC</h2>
         <div class="section-divider"></div>
-        <p>Moments from our school community &mdash; photos coming soon!</p>
+        <p>Moments from our school community.</p>
     </div>
 
-    <div class="gallery-grid">
-        <div class="photo-placeholder reveal reveal-delay-1">
-            <div class="ph-icon">&#127979;</div>
-            <span>Classroom Life</span>
+    <!-- Film strip — bleeds edge-to-edge, no user interaction -->
+    <div class="home-filmstrip" aria-hidden="true">
+        <div class="hstrip-holes hstrip-holes--top">
+            <?php for ( $i = 0; $i < 80; $i++ ) : ?><span></span><?php endfor; ?>
         </div>
-        <div class="photo-placeholder reveal reveal-delay-2">
-            <div class="ph-icon">&#9917;</div>
-            <span>Sports &amp; Activities</span>
+        <div class="hstrip-track-wrap">
+            <div class="hstrip-track" id="homeStripTrack"></div>
         </div>
-        <div class="photo-placeholder reveal reveal-delay-3">
-            <div class="ph-icon">&#127912;</div>
-            <span>Arts &amp; Culture</span>
-        </div>
-        <div class="photo-placeholder reveal reveal-delay-1">
-            <div class="ph-icon">&#127891;</div>
-            <span>Achievements</span>
-        </div>
-        <div class="photo-placeholder reveal reveal-delay-2">
-            <div class="ph-icon">&#127775;</div>
-            <span>School Events</span>
-        </div>
-        <div class="photo-placeholder reveal reveal-delay-3">
-            <div class="ph-icon">&#129293;</div>
-            <span>Our Community</span>
+        <div class="hstrip-holes hstrip-holes--bottom">
+            <?php for ( $i = 0; $i < 80; $i++ ) : ?><span></span><?php endfor; ?>
         </div>
     </div>
+
+    <script>window.KTC_HOME_GALLERY = <?php echo $_ktc_home_gallery_json; ?>;</script>
+
 </section>
 
 <!-- ══ ABOUT US ════════════════════════════════════════════ -->

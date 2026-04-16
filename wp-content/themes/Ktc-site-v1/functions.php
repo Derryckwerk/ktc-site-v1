@@ -28,9 +28,20 @@ function ktc_fallback_menu() {
         home_url( '/contact-us' )  => 'Contact Us',
     ];
 
+    // Build the current full URL to compare against menu items.
+    $current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+    // Normalise by stripping query strings for comparison.
+    $current_path = strtok( $current_url, '?' );
+
     echo '<ul>';
     foreach ( $items as $url => $label ) {
-        echo '<li><a href="' . esc_url( $url ) . '">' . esc_html( $label ) . '</a></li>';
+        // Match home exactly; match other pages by path prefix.
+        if ( trailingslashit( $current_path ) === trailingslashit( $url ) ) {
+            $class = ' class="current_page_item"';
+        } else {
+            $class = '';
+        }
+        echo '<li' . $class . '><a href="' . esc_url( $url ) . '">' . esc_html( $label ) . '</a></li>';
     }
     echo '</ul>';
 }

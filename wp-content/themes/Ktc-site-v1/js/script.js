@@ -1,4 +1,4 @@
-/* KTC – Mobile Navigation Toggle + Scroll Reveal */
+﻿/* KTC – Mobile Navigation Toggle + Scroll Reveal */
 document.addEventListener( 'DOMContentLoaded', function () {
 
     /* ── Mobile nav toggle ───────────────────────────────── */
@@ -419,7 +419,8 @@ document.addEventListener( 'DOMContentLoaded', function () {
         track.style.animation = animName + ' ' + duration + 's linear infinite';
     }
 
-    var stripPhotosL = shuffle( allPhotos );
+
+var stripPhotosL = shuffle( allPhotos );
     var stripPhotosR = shuffle( allPhotos );
 
     buildVStrip( trackLeft,  stripPhotosL, 'down' );
@@ -485,4 +486,58 @@ document.addEventListener( 'DOMContentLoaded', function () {
 
 }());
 
+/* ══════════════════════════════════════════════════════════════
+   HOME PAGE — Horizontal Filmstrip
+   ══════════════════════════════════════════════════════════════ */
+( function () {
+    var track = document.getElementById( 'homeStripTrack' );
+    if ( ! track ) { return; }
 
+    var photos    = ( window.KTC_HOME_GALLERY && window.KTC_HOME_GALLERY.length )
+        ? window.KTC_HOME_GALLERY.slice()
+        : [];
+
+    var PHOTO_W   = 250;   /* px */
+    var GAP       = 10;    /* px */
+    var MIN_SLOTS = 5;     /* always show at least this many slots */
+
+    /*
+     * Pad with nulls to reach MIN_SLOTS so the strip always has frames.
+     * Null entries render as blank dark squares.
+     */
+    var base = photos.slice();
+    while ( base.length < MIN_SLOTS ) { base.push( null ); }
+
+    /* Triple for seamless infinite loop */
+    var slots = base.concat( base ).concat( base );
+
+    var frag = document.createDocumentFragment();
+    slots.forEach( function ( photo ) {
+        var div = document.createElement( 'div' );
+        div.className = 'hstrip-photo' + ( photo ? '' : ' hstrip-photo--empty' );
+        if ( photo ) {
+            var img       = document.createElement( 'img' );
+            img.src       = photo.url;
+            img.alt       = photo.alt || '';
+            img.loading   = 'lazy';
+            img.draggable = false;
+            div.appendChild( img );
+        }
+        frag.appendChild( div );
+    } );
+    track.appendChild( frag );
+
+    /* One full "base" set width drives the seamless loop */
+    var setW     = base.length * ( PHOTO_W + GAP );
+    var duration = base.length * 3.2; /* ~3.2 s per photo */
+
+    var style = document.createElement( 'style' );
+    style.textContent =
+        '@keyframes ktcHStrip {' +
+        '  0%   { transform: translateX(0); }' +
+        '  100% { transform: translateX(-' + setW + 'px); }' +
+        '}';
+    document.head.appendChild( style );
+
+    track.style.animation = 'ktcHStrip ' + duration + 's linear infinite';
+}() );

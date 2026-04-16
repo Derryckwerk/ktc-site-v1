@@ -2474,3 +2474,112 @@ section { padding: 88px 32px; }
   .book-spine { width: 100%; height: 10px; }
 }
 
+
+/* ══════════════════════════════════════════════════════════════
+   FORM FEEDBACK PAGE  (success / error after form submission)
+   ══════════════════════════════════════════════════════════════ */
+
+.feedback-section {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  background: var(--bg-base);
+}
+
+.feedback-inner {
+  max-width: 520px;
+  width: 100%;
+  background: var(--bg-raised);
+  border-radius: var(--radius);
+  padding: 52px 48px;
+  text-align: center;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.35);
+}
+
+.feedback-logo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid var(--gold);
+  background: var(--bg-elevated);
+  object-fit: cover;
+  margin-bottom: 28px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.feedback-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+}
+
+.feedback-icon svg {
+  width: 40px;
+  height: 40px;
+  fill: #fff;
+}
+
+.feedback-icon--success {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  box-shadow: 0 0 30px rgba(46, 204, 113, 0.35);
+}
+
+.feedback-icon--error {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  box-shadow: 0 0 30px rgba(231, 76, 60, 0.35);
+}
+
+.feedback-title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 800;
+  color: var(--white);
+  margin: 0 0 14px;
+  line-height: 1.2;
+}
+
+.feedback-msg {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 32px;
+}
+
+.feedback-msg a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+.feedback-msg a:hover {
+  text-decoration: underline;
+}
+
+.btn-back-feedback {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+  color: var(--bg-base);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 13px 32px;
+  border-radius: var(--radius-pill);
+  transition: opacity var(--t-fast) var(--ease),
+              transform var(--t-fast) var(--ease);
+}
+
+.btn-back-feedback:hover {
+  opacity: 0.88;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 480px) {
+  .feedback-inner { padding: 36px 24px; }
+}
+

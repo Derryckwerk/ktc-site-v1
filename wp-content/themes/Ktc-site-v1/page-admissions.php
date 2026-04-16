@@ -5,6 +5,14 @@
  */
 get_header();
 
+// Show success / error feedback after form submission and exit early.
+$_ktc_sent = isset( $_GET['sent'] ) ? sanitize_key( $_GET['sent'] ) : '';
+if ( 'success' === $_ktc_sent || 'error' === $_ktc_sent ) {
+    ktc_render_form_feedback( $_ktc_sent, 'Admissions', home_url( '/admissions' ) );
+    get_footer();
+    return;
+}
+
 // Pull PDFs from the FileBird "Admissions" folder, keyed by file slug.
 $admissions_pdfs = ktc_get_filebird_pdfs( 'Admissions' );
 

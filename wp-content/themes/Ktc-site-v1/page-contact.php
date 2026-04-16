@@ -4,6 +4,14 @@
  * The full Contact Us page for Kuruman Tuition Centre.
  */
 get_header();
+
+// Show success / error feedback after form submission and exit early.
+$_ktc_sent = isset( $_GET['sent'] ) ? sanitize_key( $_GET['sent'] ) : '';
+if ( 'success' === $_ktc_sent || 'error' === $_ktc_sent ) {
+    ktc_render_form_feedback( $_ktc_sent, 'Contact Us', home_url( '/contact-us' ) );
+    get_footer();
+    return;
+}
 ?>
 
 <section class="contact-section">

@@ -38,6 +38,19 @@ $json_images = wp_json_encode( array_values( $images ) );
       <!-- ════ BOOK + SIDE STRIPS LAYOUT ══════════════════════ -->
       <div class="gallery-stage reveal reveal-delay-1">
 
+        <!-- Mobile-only: top horizontal filmstrip -->
+        <div class="gallery-hstrip-mobile gallery-hstrip-mobile--top" aria-hidden="true">
+          <div class="hstrip-holes hstrip-holes--top">
+            <?php for ( $i = 0; $i < 60; $i++ ) : ?><span></span><?php endfor; ?>
+          </div>
+          <div class="hstrip-track-wrap">
+            <div class="hstrip-track" id="mobileStripTrackTop"></div>
+          </div>
+          <div class="hstrip-holes hstrip-holes--bottom">
+            <?php for ( $i = 0; $i < 60; $i++ ) : ?><span></span><?php endfor; ?>
+          </div>
+        </div>
+
         <!-- Left vertical filmstrip (top → bottom) -->
         <div class="gallery-vstrip gallery-vstrip--left" aria-hidden="true">
           <div class="vstrip-holes vstrip-holes--left" aria-hidden="true">
@@ -88,6 +101,19 @@ $json_images = wp_json_encode( array_values( $images ) );
           <div class="vstrip-track" id="vstripTrackRight"><!-- JS --></div>
           <div class="vstrip-holes vstrip-holes--right" aria-hidden="true">
             <?php for ( $i = 0; $i < 30; $i++ ) : ?><span></span><?php endfor; ?>
+          </div>
+        </div>
+
+        <!-- Mobile-only: bottom horizontal filmstrip -->
+        <div class="gallery-hstrip-mobile gallery-hstrip-mobile--bottom" aria-hidden="true">
+          <div class="hstrip-holes hstrip-holes--top">
+            <?php for ( $i = 0; $i < 60; $i++ ) : ?><span></span><?php endfor; ?>
+          </div>
+          <div class="hstrip-track-wrap">
+            <div class="hstrip-track" id="mobileStripTrackBottom"></div>
+          </div>
+          <div class="hstrip-holes hstrip-holes--bottom">
+            <?php for ( $i = 0; $i < 60; $i++ ) : ?><span></span><?php endfor; ?>
           </div>
         </div>
 

@@ -103,8 +103,9 @@ body {
 }
 
 @media screen and (max-width: 782px) {
+  /* On phones/tablets the WP admin bar moves to the bottom — keep header at top:0 */
   .admin-bar .site-header {
-    top: 46px;
+    top: 0;
   }
 }
 
@@ -909,14 +910,15 @@ section { padding: 88px 32px; }
 
   .main-nav {
     display: none;
-    position: absolute;
+    position: fixed;
     top: 68px;
     left: 0;
     right: 0;
-    background: var(--bg-glass);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border-bottom: 1px solid rgba(255,184,48,.14);
+    background: rgba(17, 17, 19, 0.82);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border-bottom: 1px solid rgba(255,184,48,.22);
+    box-shadow: 0 8px 32px rgba(0,0,0,.55);
     padding: 16px 0;
     z-index: 199;
   }
@@ -1380,6 +1382,8 @@ section { padding: 88px 32px; }
   isolation: isolate;
   clip-path: inset(0 round calc(var(--radius) - 1px));
   -webkit-clip-path: inset(0 round calc(var(--radius) - 1px));
+  /* Ensure the clip box always matches the actual iframe width */
+  width: 100%;
 }
 
 .newsfeed-iframe {
@@ -1664,6 +1668,7 @@ section { padding: 88px 32px; }
 .btn-download {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
   background: var(--gold);
   color: #0B0B0C;
@@ -1672,6 +1677,10 @@ section { padding: 88px 32px; }
   font-size: .88rem;
   padding: 10px 22px;
   border-radius: var(--radius-pill);
+  text-align: center;
+  white-space: normal;    /* allow wrapping */
+  word-break: break-word;
+  line-height: 1.3;
   transition: transform var(--t-fast) var(--ease-spring),
               box-shadow var(--t-base) var(--ease),
               background var(--t-fast) var(--ease);
@@ -1878,10 +1887,38 @@ section { padding: 88px 32px; }
   .admissions-forms-grid { grid-template-columns: repeat(2, 1fr); }
   .file-upload-wrap { flex-direction: column; align-items: flex-start; }
   .file-name-display { max-width: 100%; }
+
+  /* Make each download card a column with the button spanning full width */
+  .admissions-form-card {
+    padding: 20px 14px;
+    gap: 10px;
+  }
+
+  /* Button fills the full card width so text never overflows */
+  .admissions-form-card .btn-download {
+    width: 100%;
+    font-size: .82rem;
+    padding: 9px 12px;
+  }
+
+  .admissions-form-card .btn-download--soon {
+    width: 100%;
+    font-size: .82rem;
+    padding: 9px 12px;
+  }
+
+  .afc-icon { font-size: 2rem; }
+
+  .afc-details h3 { font-size: .88rem; }
 }
 
 @media (max-width: 380px) {
   .admissions-forms-grid { grid-template-columns: 1fr; }
+
+  .admissions-form-card .btn-download,
+  .admissions-form-card .btn-download--soon {
+    font-size: .78rem;
+  }
 }
 
 
@@ -2320,6 +2357,11 @@ section { padding: 88px 32px; }
   margin-bottom: 60px;
 }
 
+/* Mobile horizontal filmstrips — hidden on desktop, shown only on phones via media query */
+.gallery-hstrip-mobile {
+  display: none;
+}
+
 /* ── Outer book+controls column ── */
 .gallery-book-wrap {
   display: flex;
@@ -2580,29 +2622,154 @@ section { padding: 88px 32px; }
   font-size: .82rem; color: rgba(255,255,255,.45); white-space: nowrap;
 }
 
-/* ── Responsive ── */
+/* ── Gallery Responsive ── */
+
+/* ── Tablet (≤ 860px): shrink side strips but keep them ── */
 @media (max-width: 860px) {
   .gallery-vstrip { width: 80px; }
   .vstrip-photo   { width: 58px; height: 58px; }
   .vstrip-holes   { width: 10px; }
 }
 
-@media (max-width: 600px) {
-  /* Hide strips on small phones */
+/* ── Tablet (541-860px): enough room to still show side strips + book ── */
+@media (max-width: 860px) and (min-width: 541px) {
+  /* Keep vertical strips visible — slightly smaller book to fit */
+  .gallery-book-wrap { max-width: 480px; }
+}
+
+/* ── Phone (≤ 540px): single-photo pager + horizontal filmstrips ── */
+@media (max-width: 540px) {
+
+  /* Hide the fixed vertical side strips */
   .gallery-vstrip { display: none; }
-  .gallery-pg-section { padding: 68px 16px 40px; }
-  .book-spine { width: 10px; }
+
+  /* Section container */
+  .gallery-pg-section {
+    padding: 68px 0 40px;
+  }
+
+  .gallery-pg-inner {
+    padding: 0;
+  }
+
+  /* Stack stage vertically: top strip → book → bottom strip */
+  .gallery-stage {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin-bottom: 32px;
+  }
+
+  /* ── Horizontal filmstrips ── */
+  .gallery-hstrip-mobile {
+    display: flex;                /* shown only on mobile */
+    flex-direction: column;
+    background: #0A0A0B;
+    border-top: 1px solid rgba(255,184,48,.15);
+    border-bottom: 1px solid rgba(255,184,48,.15);
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .gallery-hstrip-mobile .hstrip-holes {
+    width: 100%;
+    height: 14px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .gallery-hstrip-mobile .hstrip-holes span {
+    flex-shrink: 0;
+    width: 9px;
+    height: 6px;
+    margin: 0 5px;
+    background: #1a1a1d;
+    border-radius: 2px;
+    border: 1px solid rgba(255,255,255,.07);
+    display: block;
+  }
+
+  .gallery-hstrip-mobile .hstrip-track-wrap {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .gallery-hstrip-mobile .hstrip-track {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    padding: 8px 0;
+    width: max-content;
+    will-change: transform;
+  }
+
+  .gallery-hstrip-mobile .hstrip-photo {
+    flex-shrink: 0;
+    width: 110px;
+    height: 82px;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1.5px solid rgba(255,184,48,.10);
+    background: #1C1C1F;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  .gallery-hstrip-mobile .hstrip-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+
+  /* ── Book: single page (hide right page & spine) ── */
+  .gallery-book-wrap {
+    max-width: 100%;
+    padding: 12px 16px;
+  }
+
+  .gallery-book {
+    flex-direction: row;
+    min-height: auto;
+    border-radius: var(--radius-sm);
+  }
+
+  .book-page--right,
+  .book-spine {
+    display: none;
+  }
+
+  .book-page--left {
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    flex: 1;
+  }
+
+  .book-img-wrap {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+  }
+
+  /* Controls */
+  .book-controls {
+    gap: 12px;
+    padding: 0 16px;
+  }
+
+  .book-btn     { width: 44px; height: 44px; }
+  .book-btn svg { width: 20px; height: 20px; }
+
+  .book-counter {
+    font-size: .82rem;
+    min-width: 80px;
+  }
+
+  /* Lightbox arrows closer in on small screens */
   .glb-arrow  { width: 40px; height: 40px; font-size: 1.6rem; }
   .glb-arrow--prev { left: 8px; }
   .glb-arrow--next { right: 8px; }
 }
 
-@media (max-width: 420px) {
-  .gallery-book { flex-direction: column; border-radius: var(--radius); }
-  .book-page--left  { border-radius: var(--radius) var(--radius) 0 0; }
-  .book-page--right { border-radius: 0 0 var(--radius) var(--radius); }
-  .book-spine { width: 100%; height: 10px; }
-}
 
 
 /* ══════════════════════════════════════════════════════════════
@@ -2711,5 +2878,311 @@ section { padding: 88px 32px; }
 
 @media (max-width: 480px) {
   .feedback-inner { padding: 36px 24px; }
+}
+
+/* ================================================================
+   GLOBAL MOBILE FOUNDATION
+   Prevents horizontal overflow on ALL pages — must come after
+   every other rule so it cannot be overridden by specificity.
+   ================================================================ */
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  overflow-x: hidden;
+  /* Ensure long words / URLs wrap instead of breaking layout */
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Images should never stretch outside their container */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── Hamburger → X animation ─────────────────────────────────── */
+/* The JS already sets aria-expanded="true" when the menu opens.
+   We use that to morph the 3 bars into an × with CSS only.      */
+.menu-toggle span {
+  transition: transform 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              opacity   0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform-origin: center;
+}
+
+/* Top bar: slide down + rotate CW to 45° */
+.menu-toggle[aria-expanded="true"] span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+/* Middle bar: fade + shrink out */
+.menu-toggle[aria-expanded="true"] span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+/* Bottom bar: slide up + rotate CCW to −45° */
+.menu-toggle[aria-expanded="true"] span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Mobile nav: animate with max-height instead of display:none
+   so the open/close has a smooth slide-down feel              */
+@media (max-width: 768px) {
+  .main-nav {
+    display: block !important;  /* always in flow */
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                opacity    0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 68px;
+    left: 0;
+    right: 0;
+    background: rgba(17, 17, 19, 0.82);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border-bottom: 1px solid rgba(255, 184, 48, 0.22);
+    box-shadow: 0 8px 32px rgba(0,0,0,.55);
+    z-index: 199;
+  }
+
+  .main-nav.is-open {
+    display: block !important;
+    max-height: 480px;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+/* ================================================================
+   TABLET  —  ≤ 900 px
+   ================================================================ */
+@media (max-width: 900px) {
+  /* Hero: trim the large top/bottom padding a touch */
+  .hero-section { padding: 80px 28px 72px; }
+
+  /* Section general */
+  section { padding: 72px 28px; }
+
+  /* About logo wrap: less padding when stacked */
+  .about-logo-wrap  { padding: 28px; }
+  .about-logo-img   { max-width: 220px; }
+}
+
+/* ================================================================
+   SMALL TABLET / PHONE LANDSCAPE  —  ≤ 768 px
+   ================================================================ */
+@media (max-width: 768px) {
+  /* ── Hero ── */
+  .hero-section   { padding: 68px 22px 60px; }
+  .hero-logo      { width: 130px; margin-bottom: 20px; }
+  .hero-badge     { font-size: .72rem; padding: 6px 14px; margin-bottom: 16px; }
+  .hero-subtitle  { font-size: 1rem; margin-bottom: 30px; }
+  .hero-btn       { padding: 13px 34px; font-size: .95rem; }
+
+  /* ── Section header ── */
+  .section-header { margin-bottom: 44px; }
+  .section-header h2 { font-size: clamp(1.6rem, 5vw, 2.2rem); }
+
+  /* ── About ── */
+  .about-content h2  { font-size: 1.85rem; }
+  .about-logo-wrap   { padding: 22px; }
+  .about-logo-img    { max-width: 180px; }
+  .about-highlight   { padding: 14px 18px; }
+
+  /* ── Values ── */
+  .value-card { padding: 30px 18px 24px; }
+
+  /* ── Footer ── */
+  .site-footer    { padding: 44px 20px 20px; }
+  .footer-nav     { gap: 16px; }
+  .footer-logo    { font-size: 1.25rem; }
+  .footer-tagline { font-size: .82rem; }
+
+  /* ── Coming soon ── */
+  .coming-soon-box   { padding: 44px 26px; border-radius: 22px; }
+  .coming-soon-box h1 { font-size: 2rem; }
+
+  /* ── Admissions ── */
+  .admissions-section { padding: 68px 20px; }
+
+  /* ── Contact ── */
+  .contact-section { padding: 68px 20px; }
+
+  /* ── Newsfeed ── */
+  .newsfeed-section { padding: 68px 20px; }
+  .newsfeed-fb-wrap { width: 100%; }
+  /* Let JS set the iframe width via the src URL rebuild;
+     CSS max-width:100% ensures the element never exceeds the container */
+  .newsfeed-iframe  { width: 100% !important; max-width: 100%; }
+
+  /* ── Gallery ── */
+  .gallery-pg-section { padding: 68px 16px 40px; }
+
+  /* ── Resources ── */
+  .resources-section { padding: 68px 20px 80px; }
+}
+
+/* ================================================================
+   PHONE PORTRAIT  —  ≤ 540 px
+   ================================================================ */
+@media (max-width: 540px) {
+  /* ── Hero ── */
+  .hero-section  { padding: 56px 18px 52px; }
+  .hero-logo     { width: 105px; }
+  .hero-title    { letter-spacing: -0.03em; }
+  .hero-subtitle { font-size: .95rem; max-width: 100%; }
+  .hero-btn {
+    display: block;
+    text-align: center;
+    padding: 14px 24px;
+    width: 100%;
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ── Sections ── */
+  section { padding: 56px 18px; }
+
+  /* ── About ── */
+  .about-inner    { gap: 28px; }
+  .about-logo-wrap { padding: 20px; }
+  .about-logo-img  { max-width: 150px; }
+
+  /* ── Values ── */
+  .value-icon    { font-size: 2.2rem; }
+  .value-card h3 { font-size: .95rem; }
+
+  /* ── Footer ── */
+  .footer-nav   { gap: 12px 20px; }
+  .footer-nav a { font-size: .78rem; }
+
+  /* ── Contact ── */
+  .contact-info-card,
+  .contact-form-card { padding: 26px 18px; }
+  .contact-icon { font-size: 1.5rem; }
+  .contact-detail-text a { font-size: .93rem; }
+  .contact-social-btns { flex-direction: column; align-items: stretch; }
+  .btn-facebook,
+  .btn-instagram { justify-content: center; font-size: .88rem; padding: 12px 22px; }
+
+  /* ── Coming soon ── */
+  .coming-soon-wrap  { padding: 48px 16px; }
+  .coming-soon-box   { padding: 34px 18px; border-radius: 18px; }
+  .coming-soon-box h1 { font-size: 1.75rem; }
+  .cs-icon { font-size: 3.2rem; }
+  .btn-home { display: block; text-align: center; }
+
+  /* ── Admissions ── */
+  .admissions-section { padding: 56px 18px; }
+  .admissions-form-card-wrap { padding: 28px 18px; }
+  .admissions-info-item { padding: 18px 16px; }
+
+  /* ── Resources ── */
+  .resources-section { padding: 56px 18px 80px; }
+
+  /* ── Newsfeed ── */
+  .newsfeed-section { padding: 56px 18px; }
+  .newsfeed-inner   { max-width: 100%; }
+
+  /* ── Gallery ── */
+  .gallery-pg-section { padding: 56px 12px 36px; }
+  .book-controls { gap: 14px; }
+
+  /* ── Feedback ── */
+  .feedback-inner { padding: 30px 18px; }
+}
+
+/* ================================================================
+   SMALL PHONE  —  ≤ 400 px
+   ================================================================ */
+@media (max-width: 400px) {
+  /* ── Header ── */
+  .header-inner { padding: 0 14px; }
+  .logo-text-wrap .school-name { font-size: .92rem; }
+  .logo-text-wrap .school-tag  { font-size: .58rem; }
+  .header-logo-img { width: 44px; height: 44px; }
+
+  /* ── Hero ── */
+  .hero-section { padding: 48px 14px 44px; }
+  .hero-logo    { width: 88px; margin-bottom: 16px; }
+  .hero-badge   { font-size: .66rem; padding: 5px 11px; letter-spacing: .4px; }
+  .hero-btn     { max-width: 100%; }
+
+  /* ── Sections ── */
+  section { padding: 48px 14px; }
+
+  /* ── Section header ── */
+  .section-header { margin-bottom: 36px; }
+
+  /* ── Footer ── */
+  .site-footer { padding: 32px 14px 18px; }
+  .footer-nav  { flex-direction: column; align-items: center; gap: 8px; }
+  .footer-logo { font-size: 1.1rem; }
+  .footer-logo-img { width: 70px; }
+
+  /* ── Values ── */
+  .values-grid { gap: 12px; }
+  .value-card  { padding: 26px 16px 20px; }
+
+  /* ── About ── */
+  .about-logo-wrap { padding: 16px; }
+  .about-logo-img  { max-width: 130px; }
+  .about-content h2 { font-size: 1.6rem; }
+  .about-content p  { font-size: .92rem; }
+
+  /* ── Contact ── */
+  .contact-info-card,
+  .contact-form-card { padding: 22px 14px; }
+  .contact-map iframe { height: 200px; }
+
+  /* ── Admissions ── */
+  .admissions-info-item { padding: 14px 12px; }
+  .aii-text strong { font-size: .85rem; }
+
+  /* ── Resources ── */
+  .res-grade-grid   { gap: 10px; }
+  .res-grade-nobreak { gap: 10px; }
+  .res-grade-btn    { padding: 10px 16px; font-size: .82rem; }
+  .res-term-btn     { padding: 10px 18px; font-size: .84rem; }
+  .res-modal        { padding: 32px 14px 22px; }
+  .res-modal-title  { font-size: 1.15rem; }
+
+  /* ── Gallery book ── */
+  .book-btn     { width: 40px; height: 40px; }
+  .book-btn svg { width: 18px; height: 18px; }
+  .book-counter { font-size: .78rem; }
+
+  /* ── Coming soon ── */
+  .coming-soon-box { padding: 28px 14px; }
+  .btn-home { padding: 11px 24px; }
+
+  /* ── Feedback ── */
+  .feedback-inner { padding: 26px 14px; }
+}
+
+/* ================================================================
+   VERY SMALL PHONE  —  ≤ 360 px
+   ================================================================ */
+@media (max-width: 360px) {
+  .header-inner { padding: 0 12px; }
+  .logo-text-wrap .school-name { font-size: .85rem; }
+  .header-logo-img { width: 38px; height: 38px; }
+
+  .hero-section { padding: 44px 12px 40px; }
+  .hero-logo    { width: 78px; }
+
+  section { padding: 44px 12px; }
+
+  .admissions-forms-grid { grid-template-columns: 1fr; }
+
+  .res-grade-btn { padding: 9px 13px; font-size: .78rem; }
+  .res-term-btn  { padding: 9px 15px; font-size: .8rem; }
 }
 

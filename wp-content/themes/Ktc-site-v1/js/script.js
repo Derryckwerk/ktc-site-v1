@@ -6,16 +6,66 @@ document.addEventListener( 'DOMContentLoaded', function () {
     var nav    = document.getElementById( 'ktcMainNav' );
 
     if ( toggle && nav ) {
+        /*
+         * WHY we move the nav: backdrop-filter on a child element composites
+         * against its parent's already-rendered layer, not the real page.
+         * Because <nav> lives inside <header> (which has backdrop-filter),
+         * the blur has nothing to act on.  Moving nav to <body> on open puts
+         * it outside the header's stacking context so its own backdrop-filter
+         * blurs the actual page content — exactly like the header bar does.
+         */
+        var navHome = nav.parentNode; /* header-inner — restore here on close */
+
+        function openMobileNav() {
+            /* Teleport nav to <body> so backdrop-filter escapes header's stacking context */
+            if ( nav.parentNode !== document.body ) {
+                document.body.insertBefore( nav, document.body.firstChild );
+            }
+            nav.getBoundingClientRect(); /* force reflow so CSS transition plays from 0 */
+            nav.classList.add( 'is-open' );
+            toggle.setAttribute( 'aria-expanded', 'true' );
+        }
+
+        function closeMobileNav() {
+            nav.classList.remove( 'is-open' );
+            toggle.setAttribute( 'aria-expanded', 'false' );
+            /* Wait for close animation (0.38s) then return nav to header-inner */
+            setTimeout( function () {
+                if ( ! nav.classList.contains( 'is-open' ) && nav.parentNode !== navHome ) {
+                    navHome.appendChild( nav );
+                }
+            }, 420 );
+        }
+
         toggle.addEventListener( 'click', function () {
-            var isOpen = nav.classList.toggle( 'is-open' );
-            toggle.setAttribute( 'aria-expanded', isOpen ? 'true' : 'false' );
+            if ( nav.classList.contains( 'is-open' ) ) {
+                closeMobileNav();
+            } else {
+                openMobileNav();
+            }
         } );
 
         nav.querySelectorAll( 'a' ).forEach( function ( link ) {
             link.addEventListener( 'click', function () {
-                nav.classList.remove( 'is-open' );
-                toggle.setAttribute( 'aria-expanded', 'false' );
+                closeMobileNav();
             } );
+        } );
+
+        /* Close menu when tapping outside on mobile */
+        document.addEventListener( 'click', function ( e ) {
+            if ( nav.classList.contains( 'is-open' ) &&
+                 ! nav.contains( e.target ) &&
+                 ! toggle.contains( e.target ) ) {
+                closeMobileNav();
+            }
+        } );
+
+        /* Close menu on Escape key */
+        document.addEventListener( 'keydown', function ( e ) {
+            if ( e.key === 'Escape' && nav.classList.contains( 'is-open' ) ) {
+                closeMobileNav();
+                toggle.focus();
+            }
         } );
     }
 
@@ -427,6 +477,121 @@ var stripPhotosL = shuffle( allPhotos );
     buildVStrip( trackRight, stripPhotosR, 'up' );
 
     /* ──────────────────────────────────────────────────────
+       MOBILE HORIZONTAL FILMSTRIPS (phone ≤ 540px)
+       Two strips: top runs left→right, bottom runs right→left
+    ────────────────────────────────────────────────────── */
+    var mobileTrackTop    = document.getElementById( 'mobileStripTrackTop' );
+    var mobileTrackBottom = document.getElementById( 'mobileStripTrackBottom' );
+
+    function buildHStripMobile( track, photos, direction ) {
+        if ( ! track ) { return; }
+        /* Triple for seamless looping */
+        var tripled = photos.concat( photos ).concat( photos );
+        var frag    = document.createDocumentFragment();
+
+        tripled.forEach( function ( photo, i ) {
+            var div = document.createElement( 'div' );
+            div.className = 'hstrip-photo';
+            var img = document.createElement( 'img' );
+            img.src     = photo.url;
+            img.alt     = photo.alt;
+            img.loading = 'lazy';
+            div.appendChild( img );
+            div.addEventListener( 'click', function () {
+                openLightbox( photos, i % photos.length );
+            } );
+            frag.appendChild( div );
+        } );
+        track.appendChild( frag );
+
+        /* Each photo is 110px wide + 8px gap = 118px */
+        var photoW   = 118;
+        var setW     = photoW * photos.length;
+        var duration = photos.length * 1.8; /* ~1.8s per photo */
+        var animName = 'ktcHStripMobile_' + direction;
+
+        var style = document.createElement( 'style' );
+        if ( direction === 'left' ) {
+            style.textContent =
+                '@keyframes ' + animName + ' {' +
+                '  0%   { transform: translateX(0); }' +
+                '  100% { transform: translateX(-' + setW + 'px); }' +
+                '}';
+        } else {
+            style.textContent =
+                '@keyframes ' + animName + ' {' +
+                '  0%   { transform: translateX(-' + setW + 'px); }' +
+                '  100% { transform: translateX(0); }' +
+                '}';
+        }
+        document.head.appendChild( style );
+        track.style.animation = animName + ' ' + duration + 's linear infinite';
+    }
+
+    buildHStripMobile( mobileTrackTop,    shuffle( allPhotos ), 'left' );
+    buildHStripMobile( mobileTrackBottom, shuffle( allPhotos ), 'right' );
+
+    /* Also switch book to single-page mode on mobile */
+    function applyMobileBookMode() {
+        var isMobile = window.innerWidth <= 540;
+        if ( isMobile && ! window._ktcMobileModeApplied ) {
+            window._ktcMobileModeApplied = true;
+
+            /* Override renderBook: 1 photo per page — index is just `page`, not `page*2` */
+            renderBook = function () {
+                var idx   = page;   /* one photo per step, no skipping */
+                var wrapL = imgLeft && imgLeft.closest( '.book-img-wrap' );
+                if ( wrapL ) { wrapL.classList.add( 'is-turning' ); }
+                setTimeout( function () {
+                    if ( imgLeft ) {
+                        imgLeft.src = bookPhotos[ idx ] ? bookPhotos[ idx ].url : '';
+                        imgLeft.alt = bookPhotos[ idx ] ? bookPhotos[ idx ].alt : '';
+                    }
+                    if ( numLeft ) {
+                        numLeft.textContent = bookPhotos[ idx ]
+                            ? ( idx + 1 ) + ' / ' + total : '';
+                    }
+                    if ( wrapL ) { wrapL.classList.remove( 'is-turning' ); }
+                    turning = false;
+                }, 250 );
+                if ( btnPrev ) { btnPrev.disabled = ( page === 0 ); }
+                if ( btnNext ) { btnNext.disabled = ( page >= total - 1 ); }
+                if ( counter ) { counter.textContent = ( idx + 1 ) + ' of ' + total; }
+            };
+
+            /*
+             * The original btnNext handler has a hardcoded `Math.ceil(total/2)-1`
+             * guard designed for 2-photos-per-page desktop mode — it would stop
+             * navigation halfway through on mobile.  Replace both handlers with
+             * mobile-correct versions by cloning the buttons (removes old listeners).
+             */
+            if ( btnPrev ) {
+                var newPrev = btnPrev.cloneNode( true );
+                btnPrev.parentNode.replaceChild( newPrev, btnPrev );
+                btnPrev = newPrev;
+                btnPrev.addEventListener( 'click', function () {
+                    if ( turning || page === 0 ) { return; }
+                    turning = true; page--; renderBook();
+                } );
+            }
+            if ( btnNext ) {
+                var newNext = btnNext.cloneNode( true );
+                btnNext.parentNode.replaceChild( newNext, btnNext );
+                btnNext = newNext;
+                btnNext.addEventListener( 'click', function () {
+                    if ( turning || page >= total - 1 ) { return; }
+                    turning = true; page++; renderBook();
+                } );
+            }
+
+            /* Re-render immediately with corrected function */
+            renderBook();
+        }
+    }
+    applyMobileBookMode();
+    window.addEventListener( 'resize', applyMobileBookMode );
+
+    /* ──────────────────────────────────────────────────────
        LIGHTBOX
     ────────────────────────────────────────────────────── */
     var overlay  = document.getElementById( 'glbOverlay' );
@@ -540,4 +705,42 @@ var stripPhotosL = shuffle( allPhotos );
     document.head.appendChild( style );
 
     track.style.animation = 'ktcHStrip ' + duration + 's linear infinite';
+}() );
+
+/* ══════════════════════════════════════════════════════════════
+   NEWSFEED — Resize Facebook Page Plugin iframe for mobile
+   Facebook renders content at the width set in the src URL.
+   When the element is CSS-narrowed the content gets clipped, so
+   we rebuild the src with the real container width on small screens.
+   ══════════════════════════════════════════════════════════════ */
+( function () {
+    var iframe = document.querySelector( '.newsfeed-iframe' );
+    var wrap   = document.querySelector( '.newsfeed-fb-wrap' );
+    if ( ! iframe || ! wrap ) { return; }
+
+    var resizeTimer;
+
+    function rebuildFbSrc() {
+        /* Available inner width, minimum 180 (Facebook's floor) */
+        var containerW = wrap.offsetWidth;
+        if ( containerW <= 0 ) { containerW = 340; }
+        var targetW = Math.min( 500, Math.max( 180, containerW - 4 ) );
+
+        /* Pull the width currently baked into the src */
+        var currentW = parseInt( ( iframe.src.match( /[?&]width=(\d+)/ ) || [] )[1], 10 ) || 500;
+
+        /* Only swap if it changed by more than 4px (avoids pointless reloads) */
+        if ( Math.abs( currentW - targetW ) <= 4 ) { return; }
+
+        var newSrc = iframe.src.replace( /([?&]width=)\d+/, '$1' + targetW );
+        iframe.setAttribute( 'width', targetW );
+        iframe.src = newSrc;
+    }
+
+    /* Run on load and whenever the window is resized */
+    rebuildFbSrc();
+    window.addEventListener( 'resize', function () {
+        clearTimeout( resizeTimer );
+        resizeTimer = setTimeout( rebuildFbSrc, 300 );
+    } );
 }() );

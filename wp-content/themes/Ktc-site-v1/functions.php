@@ -61,7 +61,7 @@ function ktc_enqueue_assets() {
         'ktc-main-style',
         get_template_directory_uri() . '/css/style.css',
         [ 'ktc-google-fonts' ],
-        '1.3'
+        '1.6'
     );
 
     // Main script
@@ -69,7 +69,7 @@ function ktc_enqueue_assets() {
         'ktc-main-script',
         get_template_directory_uri() . '/js/script.js',
         [],
-        '1.2',
+        '1.7',
         true   // load in footer
     );
 
